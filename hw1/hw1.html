@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>HW1 CSS</title>
+    <style>
+
+    .bar {
+        fill: blue;
+        stroke: black;
+        stroke-width: 0.1;
+        width: 40%;
+    }
+
+    .line {
+        stroke: blue;
+        stroke-width: 0.1;
+        width: 40%;
+    }
+
+    .area {
+        fill: blue;
+        stroke: blue;
+        stroke-width: 0.1;
+        width: 40%;
+    }
+        
+    .scatterplot {
+        fill: blue;
+        stroke: blue;
+        stroke-width: 0.1;
+        width: 40%;
+    }
+    </style>
+</head>
+
+<body>
+
+<h2  style="text-align:center">CS-5630 / CS-6630 Homework 1</h2>
+<h3  style="text-align:center">Yongjian Mu</h3>
+<h3  style="text-align:center">yongjian.mu@utah.edu</h3>
+<h3  style="text-align:center">uID: u1010337</h3>
+
+<h4><a></a>Bar Charts</h4>
+<svg class="bar" height="300">
+	<g transform="translate(20, 300) scale(20, -20)">
+        <rect x="1" y="0" width="1" height="10.0"/>
+        <rect x="2" y="0" width="1" height="8.0"/>
+        <rect x="3" y="0" width="1" height="13.0"/>
+        <rect x="4" y="0" width="1" height="9.0"/>
+        <rect x="5" y="0" width="1" height="11.0"/>
+        <rect x="6" y="0" width="1" height="14.0"/>
+        <rect x="7" y="0" width="1" height="6.0"/>
+        <rect x="8" y="0" width="1" height="4.0"/>
+        <rect x="9" y="0" width="1" height="12.0"/>
+        <rect x="10" y="0" width="1" height="7.0"/>
+        <rect x="11" y="0" width="1" height="5.0"/>
+	</g>
+</svg>
+    
+<svg class="bar" height="200">
+	<g transform="translate(20, 200) scale(20, -20)">
+        <rect x="1" y="0" width="1" height="9.14"/>
+        <rect x="2" y="0" width="1" height="8.14"/>
+        <rect x="3" y="0" width="1" height="8.74"/>
+        <rect x="4" y="0" width="1" height="8.77"/>
+        <rect x="5" y="0" width="1" height="9.26"/>
+        <rect x="6" y="0" width="1" height="8.10"/>
+        <rect x="7" y="0" width="1" height="6.13"/>
+        <rect x="8" y="0" width="1" height="3.10"/>
+        <rect x="9" y="0" width="1" height="9.13"/>
+        <rect x="10" y="0" width="1" height="7.26"/>
+        <rect x="11" y="0" width="1" height="4.74"/>
+	</g>
+</svg>
+
+<h4><a></a>Line Charts</h4>
+
+<svg class="line" height="300">
+	<g transform="translate(20, 300) scale(20, -20)">
+        <line x1="1" y1="10.0" x2="2" y2="8.0"/>
+        <line x1="2" y1="8.0" x2="3" y2="13.0"/>
+        <line x1="3" y1="13.0" x2="4" y2="9.0"/>
+        <line x1="4" y1="9.0" x2="5" y2="11.0"/>
+        <line x1="5" y1="11.0" x2="6" y2="14.0"/>
+        <line x1="6" y1="14.0" x2="7" y2="6.0"/>
+        <line x1="7" y1="6.0" x2="8" y2="4.0"/>
+        <line x1="8" y1="4" x2="9" y2="12.0"/>
+        <line x1="9" y1="12.0" x2="10" y2="7.0"/>
+        <line x1="10" y1="7.0" x2="11" y2="5.0"/>
+	</g>
+</svg>    
+    
+<svg class="line" height="300">
+	<g transform="translate(20, 300) scale(20, -20)">
+        <line x1="1" y1="9.14" x2="2" y2="8.14"/>
+        <line x1="2" y1="8.14" x2="3" y2="8.74"/>
+        <line x1="3" y1="8.74" x2="4" y2="8.77"/>
+        <line x1="4" y1="8.77" x2="5" y2="9.26"/>
+        <line x1="5" y1="9.26" x2="6" y2="8.10"/>
+        <line x1="6" y1="8.10" x2="7" y2="6.13"/>
+        <line x1="7" y1="6.13" x2="8" y2="3.10"/>
+        <line x1="8" y1="3.10" x2="9" y2="9.13"/>
+        <line x1="9" y1="9.13" x2="10" y2="7.26"/>
+        <line x1="10" y1="7.26" x2="11" y2="4.74"/>
+	</g>
+</svg>
+
+<h4><a></a>Area Charts</h4>
+    
+<svg class="area" height="300">
+	<g transform="translate(20, 300) scale(20, -20)">
+        <polygon points="1,10.0 2,8.0 3,13.0 4,9.0 5,11.0 6,14.0 7,6.0 8,4.0 9,12.0 10,7.0 11,5.0 11,0.0 1,0.0 1,10.0"></polygon>
+	</g>
+</svg>
+    
+<svg class="area" height="300">
+	<g transform="translate(20, 300) scale(20, -20)">
+        <polygon points="1,9.14 2,8.14 3,8.74 4,8.77 5,9.26 6,8.10 7,6.13 8,3.10 9,9.13 10,7.26 11,4.74 11,0.0 1,0.0 1,9.14"></polygon>
+	</g>
+</svg>
+
+<h4><a></a>Scatterplot Charts</h4>
+<svg class="scatterplot" height="300">
+	<g transform="translate(20, 300) scale(20, -20)">
+        <circle cx="10.0" cy="9.14" r="0.3"/>
+        <circle cx="8.0" cy="8.14" r="0.3"/>
+        <circle cx="13.0" cy="8.74" r="0.3"/>
+        <circle cx="9.0" cy="8.77" r="0.3"/>
+        <circle cx="11.0" cy="9.26" r="0.3"/>
+        <circle cx="14.0" cy="8.10" r="0.3"/>
+        <circle cx="6.0" cy="6.13" r="0.3"/>
+        <circle cx="4.0" cy="3.10" r="0.3"/>
+        <circle cx="12.0" cy="9.13" r="0.3"/>
+        <circle cx="7.0" cy="7.26" r="0.3"/>
+        <circle cx="5.0" cy="4.74" r="0.3"/>
+	</g>
+</svg>
+    
+</body>
+</html>
