@@ -34,7 +34,6 @@ var tip = d3.tip()
     .attr("class", "d3-tip")
     .offset(function(d){return[parseFloat(d.a)+"px", parseFloat(d.b)+"px"];})
     .style("position", "absolute")
-    //.offset([0+"px",-400+"px"])
     .html(function(d) {
         return "<strong>cx= </strong> <span style='color:red'>" + d.a + "</span> <strong>cy= </strong> <span style='color:red'>" + d.b + "</span>";
     });
@@ -71,7 +70,7 @@ function update(error, data) {
         .domain([0, d3.max(data, function (d) {
             return d.a;
         })])
-        .range([0, 13]);
+        .range([0, 14]);
     var bScale = d3.scale.linear()
         .domain([0, d3.max(data, function (d) {
             return d.b;
@@ -79,7 +78,7 @@ function update(error, data) {
         .range([0, 13]);
     var iScale = d3.scale.linear()
         .domain([0, data.length])
-        .range([0, 13]);
+        .range([0, 11]);
 
     // ****** TODO: PART III (you will also edit in PART V) ******
 
@@ -125,10 +124,6 @@ function update(error, data) {
     }
 
     // TODO: Select and update the 'b' bar chart bars
-//    var secondbar = d3.select("#secondbar");
-//    var second_rects = secondbar.selectAll("rect")
-//    .data(data)
-//    .attr("height", function(d, i){return bScale(d.b);});
     var secondbar = d3.select("#secondbar");
     var second_rects = secondbar.selectAll("rect").data(data);
     
@@ -180,8 +175,7 @@ function update(error, data) {
     
     var firstline = d3.select("#firstline");
     var first_lines = firstline.selectAll("line");
-    first_lines.remove();
-    
+    first_lines.remove();    
     var first_paths = firstline.selectAll("path");
     first_paths.remove();
     firstline.append("path")
@@ -189,7 +183,6 @@ function update(error, data) {
     .style("stroke", "blue")
     .style("stroke-width", 0.1)
     .attr("d", aLineGenerator(data));
-    //console.log(firstline);
     
 
     // TODO: Select and update the 'b' line chart path (create your own generator)
@@ -211,7 +204,6 @@ function update(error, data) {
     .style("stroke", "blue")
     .style("stroke-width", 0.1)
     .attr("d", bLineGenerator(data));
-    //console.log(secondline);
 
     // TODO: Select and update the 'a' area chart path using this line generator
     var aAreaGenerator = d3.svg.area()
