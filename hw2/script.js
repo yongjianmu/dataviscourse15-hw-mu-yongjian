@@ -1,8 +1,6 @@
 /*globals alert, document, d3, console*/
 // These keep JSHint quiet if you're using it (highly recommended!)
 
-var original_item_length;
-var startup = true;
 
 function staircase() {
     // ****** TODO: PART II ******
@@ -41,6 +39,7 @@ var tip = d3.tip()
         return "<strong>cx= </strong> <span style='color:red'>" + d.a + "</span> <strong>cy= </strong> <span style='color:red'>" + d.b + "</span>";
     });
 
+var startup = true;
 function update(error, data) {
     console.log("Enter update(), data length: "+data.length);
     if (error !== null) {
@@ -88,7 +87,7 @@ function update(error, data) {
     var firstbar = d3.select("#firstbar");
     var first_rects = firstbar.selectAll("rect").data(data);
     
-    if(original_item_length != data.length && (!startup))
+    if(!startup)
     {
         console.log("Append data");
         first_rects.enter().append("rect")
@@ -133,7 +132,7 @@ function update(error, data) {
     var secondbar = d3.select("#secondbar");
     var second_rects = secondbar.selectAll("rect").data(data);
     
-    if((original_item_length != data.length) && (!startup))
+    if(!startup)
     {
         console.log("Append data");
         second_rects.enter().append("rect")
@@ -182,6 +181,7 @@ function update(error, data) {
     var firstline = d3.select("#firstline");
     var first_lines = firstline.selectAll("line");
     first_lines.remove();
+    
     var first_paths = firstline.selectAll("path");
     first_paths.remove();
     firstline.append("path")
@@ -260,7 +260,7 @@ function update(error, data) {
     var first_scatterplot = d3.select("#firstscatterplot");
     var first_circles = first_scatterplot.selectAll("circle").data(data);
   
-    if((original_item_length != data.length) && (!startup))
+    if(!startup)
     {
         console.log("Append data");
         first_circles.enter().append("circle")
@@ -277,7 +277,8 @@ function update(error, data) {
             .attr("x", function(d, i){return i;})
             .attr("y", 0)
             .attr("width", 1)
-            .attr("height", function(d, i){return aScale(d.b);})
+            .attr("cx", function(d, i){return aScale(d.a);})
+            .attr("cy", function(d, i){return aScale(d.b);})
             .style("stroke", "blue")
             .style("stroke-width", 0.1)
             .style("fill", "blue")
@@ -295,13 +296,12 @@ function update(error, data) {
         first_circles.attr("cx", function(d, i){return aScale(d.a);})
         .attr("cy", function(d, i){return aScale(d.b);});        
     }
-    first_circles.on("click", function(d,i){console.log("Circle["+i+"]: "+"cx="+d.a+" cy="+d.b)})
+    first_circles.on("click", function(d,i){console.log("Response Click Circle: "+"cx="+d.a+" cy="+d.b)})
         .call(tip)
         .on("mouseover", tip.show)
         .on("mouseout", tip.hide);
     
     
-    original_item_length = data.length;
     startup = false;
     console.log("Leave update()");
 }
