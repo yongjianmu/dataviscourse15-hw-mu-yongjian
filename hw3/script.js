@@ -87,6 +87,8 @@ function changeSelection(d) {
         selectedSeries = [];
         selectedSeries.push(d);
         updateBarChart();
+        updateMap();
+        updateForceDirectedGraph();
         console.log("changeSelection() output: selectedSeries");
         console.log(selectedSeries);
         return;
@@ -98,6 +100,7 @@ function changeSelection(d) {
         selectedSeries = teamSchedules[d.name];
         updateBarChart();
         updateMap();
+        updateForceDirectedGraph();
         console.log("changeSelection() output: selectedSeries");
         console.log(selectedSeries);
         return;
@@ -108,6 +111,8 @@ function changeSelection(d) {
         selectedSeries = [];
         selectedSeries = d.games;
         updateBarChart();
+        updateForceDirectedGraph();
+        updateMap();
         console.log("changeSelection() output: selectedSeries");
         console.log(selectedSeries);
         return;
@@ -221,7 +226,30 @@ function updateForceDirectedGraph() {
     
     // Set up the force-directed
     // layout engine
-    var nodeShape = d3.svg.symbol().type(function(d){
+    var nodeSize = 30;
+    var nodeShape = d3.svg.symbol()
+        .size(function(d){
+            if(startup)
+            {
+                return nodeSize;
+            }
+            var flag = false;
+            selectedSeries.forEach( function(input){
+                if(parseInt(d._id) == parseInt(input._id))
+                {
+                    flag = true;
+                }
+            });
+            if(flag)
+            {
+                return nodeSize*2;
+            }
+            else
+            {
+                return nodeSize;
+            }
+        })
+        .type(function(d){
         if(d.data_type === "Game")
         {
             return "circle";
@@ -276,18 +304,62 @@ function updateForceDirectedGraph() {
             .data(data.vertices);
     
     node.enter()
-        .append("path")
+        .append("path");
+    node.transition().duration(100)
         .attr("d", nodeShape)
-        .attr("class", nodeClass)
+        .style("fill", function(d){
+            if(d.data_type === "Game")
+            {
+                if(startup)
+                {
+                    return "rgba(0, 117, 128, 0.01)";
+                }
+                var flag = false;
+                var colorValue;
+                selectedSeries.forEach( function(input){
+                    if(parseInt(d._id) == parseInt(input._id) )
+                    {
+                        flag = true;
+                        colorValue = input.attendance;
+                    }
+                });
+                if(flag)
+                {
+                    return colorScale(colorValue);
+                }
+                else
+                {
+                    return "rgba(0, 117, 128, 0.01)";
+                }
+                    
+            }
+            else
+            {
+                return "rgb(123, 123, 123)";
+            }
+        })
+        .style("stroke", function(d){
+            if(d.data_type === "Game")
+            {
+                return "rgb(123, 123, 123)";
+            }
+            else
+            {
+                return "rgb(255, 255, 255)";
+            }
+        });
         // ******* TODO: PART IV *******
     
     // Make the nodes respond to hover and click events
-        .on("mouseover", function(d){setHover(d);})
+    node.on("mouseover", function(d){setHover(d);})
         .on("mouseout", function(d){clearHover();})
         .on("click", function(d){changeSelection(d);})
         .call(force.drag);
 
-    node.exit().remove();
+    node.exit()
+        .transition()
+        .duration(100)
+        .remove();
     
     // ******* TODO: PART V *******
     
@@ -329,24 +401,73 @@ function updateMap() {
     
     var svgBounds = document.getElementById("map").getBoundingClientRect();
     
-    var svgPoints = d3.select("#map")
-        .attr("width", svgBounds.width)
-        .attr("height", svgBounds.height)
-        .selectAll("#points")
+    var svgPoints = d3.select("#points").selectAll("circle")
         .data(realData);
     
     var projection = d3.geo.albersUsa()
         .translate([svgBounds.width / 2, svgBounds.height / 2])
         .scale(1200);
     
-    var radium = 5;
+    var radius = 5;
     svgPoints.enter()
-        .append("circle")
-        .attr("r", radium)
+        .append("circle");
+    svgPoints.transition().duration(100)
+        .attr("r", function(d){
+            if(startup)
+            {
+                return radius;
+            }
+            else
+            {
+                var flag = false;
+                selectedSeries.forEach( function(input){
+                    if(parseFloat(d.latitude) == parseFloat(input.latitude) && parseFloat(d.longitude) == parseFloat(input.longitude))
+                    {
+                        flag = true;
+                    }
+                });
+                if(flag)
+                {
+                    //console.log("updateMap(): Amplify");
+                    return radius*2;
+                }
+                else
+                {
+                    //console.log("updateMap(): Remain");
+                    return radius;
+                }
+            }
+        })
         .attr("transform", function(d) {return "translate(" + projection([d.longitude,d.latitude]) + ")";})
-        .attr("class", "game")
-        .attr("opacity", 0)
-        .on("mouseover", function(d){setHover(d);})
+        .style("stroke", "rgb(123, 123, 123)")
+        .style("fill", function(d){
+                if(startup)
+                {
+                    return "rgba(0, 117, 128, 0.01)";
+                }
+                var flag = false;
+                var colorValue;
+                selectedSeries.forEach( function(input){
+                    if(parseFloat(d.latitude) == parseFloat(input.latitude) && parseFloat(d.longitude) == parseFloat(input.longitude))
+                    {
+                        flag = true;
+                        colorValue = input.attendance;
+                    }
+                });
+                if(flag)
+                {
+                    console.log("updateMap(): Colored");
+                    console.log(colorScale(colorValue));
+                    return colorScale(colorValue);
+                }
+                else
+                {
+                    console.log("updateMap(): Remain Opacity");
+                    return "rgba(0, 117, 128, 0.01)";
+                }
+        });
+    
+        svgPoints.on("mouseover", function(d){setHover(d);})
         .on("mouseout", function(d){clearHover();})
         .on("click", function(d){changeSelection(d);});
     
@@ -357,41 +478,10 @@ function updateMap() {
     // Update the circle appearance (set the fill to the
     // mean attendance of all selected games... if there
     // are no matching games, revert to the circle's default style)
-    svgPoints.transition()
-    .duration(100)
-    .attr("r", function(d){
-        if(startup)
-        {
-            return radium;
-        }
-        else
-        {
-            var flag = false;
-            selectedSeries.forEach( function(input){
-                if(parseFloat(d.latitude) == parseFloat(input.latitude) && parseFloat(d.longitude) == parseFloat(input.longitude))
-                {
-                    flag = true;
-                }
-            });
-            if(flag)
-            {
-                console.log("updateMap(): Amplify");
-                return radium*2;
-            }
-            else
-            {
-                console.log("updateMap(): Remain");
-                return radium;
-            }
-        }
-    })
-    .attr("opacity", 1);
     
     svgPoints.exit()
-        .attr("opacity", 1)
         .transition()
         .duration(100)
-        .attr("opacity", 0)
         .remove();
     
     console.log("Leave updateMap");
@@ -405,8 +495,7 @@ function drawStates(usStateData) {
     console.log("Enter drawStates");
     var svgBounds = document.getElementById("map").getBoundingClientRect();
     
-    var svgState = d3.select("#map")
-        //.attr("id", "#states")
+    var svgState = d3.select("#map")//.selectAll("#states")
         .attr("width", svgBounds.width)
         .attr("height", svgBounds.height);
     
@@ -418,9 +507,8 @@ function drawStates(usStateData) {
     var path = d3.geo.path()
         .projection(projection);
         
-    svgState.insert("path", ".graticule")
-        .datum(topojson.feature(usStateData, usStateData.objects.land))
-        .attr("id", "states")
+    svgState.select("#states")
+        .datum(topojson.feature(usStateData, usStateData.objects.states))
         .attr("d", path);
 
 //    svgState.insert("path", ".graticule")
@@ -428,10 +516,10 @@ function drawStates(usStateData) {
 //        .attr("id", "states")
 //        .attr("d", path);
 
-    svgState.insert("path", ".graticule")
+    /*svgState.insert("path", ".graticule")
         .datum(topojson.mesh(usStateData, usStateData.objects.states, function(a, b) { return a !== b; }))
         .attr("id", "states")
-        .attr("d", path);
+        .attr("d", path);*/
     
     console.log("Leave drawStates");
 }
@@ -577,8 +665,8 @@ d3.json("data/us.json", function (error, usStateData) {
     if (error) throw error;
     console.log("Call drawStates");
     drawStates(usStateData);
-    console.log("Call updateMap");
-    updateMap();    
+    //console.log("Call updateMap");
+    //updateMap();    
 });
 d3.json("data/pac12_2013.json", function (error, loadedData) {
     if (error) throw error;
@@ -598,6 +686,6 @@ d3.json("data/pac12_2013.json", function (error, loadedData) {
     // Draw everything for the first time
     updateBarChart();
     updateForceDirectedGraph();
-    //console.log("Call updateMap");
-    //updateMap();
+    console.log("Call updateMap");
+    updateMap();
 });
