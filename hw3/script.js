@@ -16,8 +16,8 @@ function setHover(d) {
     // a Location
     
     // ******* TODO: PART V *******
-    var textBounds = document.getElementById("info");//.getBoundingClientRect();   
-    
+    var textBounds = document.getElementById("info");//.getBoundingClientRect(); 
+    textBounds.style.fontSize = "10px";
     if(d === null)
     {
         textBounds.innerHTML = "";
@@ -75,7 +75,6 @@ function changeSelection(d) {
     // Note that updateBarChart() needs to come first
     // so that the color scale is set
     console.log("Enter changeSelection");
-    console.log(d);
     
     if(d === null)
     {
@@ -89,8 +88,6 @@ function changeSelection(d) {
         updateBarChart();
         updateMap();
         updateForceDirectedGraph();
-        console.log("changeSelection() output: selectedSeries");
-        console.log(selectedSeries);
         return;
     }
     
@@ -101,8 +98,6 @@ function changeSelection(d) {
         updateBarChart();
         updateMap();
         updateForceDirectedGraph();
-        console.log("changeSelection() output: selectedSeries");
-        console.log(selectedSeries);
         return;
     }
     
@@ -113,8 +108,6 @@ function changeSelection(d) {
         updateBarChart();
         updateForceDirectedGraph();
         updateMap();
-        console.log("changeSelection() output: selectedSeries");
-        console.log(selectedSeries);
         return;
     }
 }
@@ -180,17 +173,13 @@ function updateBarChart() {
     var svgBarChart = d3.selectAll("#bars").selectAll("rect")
     .data(selectedSeries);
 
-//    console.log("updateBarChart(): selectedSeries");
-//    console.log(selectedSeries);
-//    console.log(svgBarChart);
     //Use the sample of lecture
     //http://dataviscourse.net/2015/lectures/lecture-d3-layouts-maps/
     svgBarChart.enter()
     .append("rect");
     svgBarChart.style("fill", function(d){
         var value = d.attendance;
-//        console.log("value");
-//        console.log(value);
+        
         if(value) 
         {
             return colorScale(value);
@@ -202,10 +191,8 @@ function updateBarChart() {
         }
     })
     .attr("x", function(d){
-        //console.log(d.Date);
         return xScale(d.Date);})
     .attr("y", function(d){
-        //console.log(d.attendance);
         return yScale(d.attendance);})
     .attr("width", xScale.rangeBand())
     .attr("height", function(d){
@@ -396,9 +383,6 @@ function updateMap() {
         realData.push(locationData[property]);
     }
     
-    console.log("realData");
-    console.log(realData);
-    
     var svgBounds = document.getElementById("map").getBoundingClientRect();
     
     var svgPoints = d3.select("#points").selectAll("circle")
@@ -428,12 +412,10 @@ function updateMap() {
                 });
                 if(flag)
                 {
-                    //console.log("updateMap(): Amplify");
                     return radius*2;
                 }
                 else
                 {
-                    //console.log("updateMap(): Remain");
                     return radius;
                 }
             }
@@ -456,13 +438,10 @@ function updateMap() {
                 });
                 if(flag)
                 {
-                    console.log("updateMap(): Colored");
-                    console.log(colorScale(colorValue));
                     return colorScale(colorValue);
                 }
                 else
                 {
-                    console.log("updateMap(): Remain Opacity");
                     return "rgba(0, 117, 128, 0.01)";
                 }
         });
