@@ -7,6 +7,7 @@ var data,
     selectedSeries,
     colorScale;
 
+var startup = true;
 
 /* EVENT RESPONSE FUNCTIONS */
 function setHover(d) {
@@ -73,6 +74,44 @@ function changeSelection(d) {
     // Update everything that is data-dependent
     // Note that updateBarChart() needs to come first
     // so that the color scale is set
+    console.log("Enter changeSelection");
+    console.log(d);
+    
+    if(d === null)
+    {
+        return;
+    }
+    
+    if(d.data_type === "Game")
+    {
+        selectedSeries = [];
+        selectedSeries.push(d);
+        updateBarChart();
+        console.log("changeSelection() output: selectedSeries");
+        console.log(selectedSeries);
+        return;
+    }
+    
+    if(d.data_type === "Team")
+    {
+        selectedSeries = [];
+        selectedSeries = teamSchedules[d.name];
+        updateBarChart();
+        updateMap();
+        console.log("changeSelection() output: selectedSeries");
+        console.log(selectedSeries);
+        return;
+    }
+    
+    if(d.data_type === "Location")
+    {
+        selectedSeries = [];
+        selectedSeries = d.games;
+        updateBarChart();
+        console.log("changeSelection() output: selectedSeries");
+        console.log(selectedSeries);
+        return;
+    }
 }
 
 /* DRAWING FUNCTIONS */
@@ -88,9 +127,10 @@ function updateBarChart() {
     // sure to leave room for the axes
     var yData = [30000, 40000, 50000, 60000, 70000, 80000, 90000];
     
+    // Use sample from http://bl.ocks.org/Caged/6476579
     var xScale = d3.scale.ordinal()
         .domain(selectedSeries.map(function(d){return d.Date;}))
-        .rangeBands([yAxisSize, svgBounds.width - yAxisSize]);
+        .rangeRoundBands([yAxisSize, svgBounds.width - yAxisSize], 0.1);
 
     var xAxis = d3.svg.axis()
         .scale(xScale)
@@ -105,15 +145,6 @@ function updateBarChart() {
         .scale(yScale)
         .orient("left");
 
-    // Create colorScale (note that colorScale
-    // is global! Other functions will refer to it)
-    colorScale = d3.scale.quantize()
-            .range(["rgb(210,248,210)","rgb(186,228,179)","rgb(116,196,118)","rgb(49,163,84)","rgb(0,109,44)"])
-            .domain([
-                d3.min(selectedSeries, function(d) { return d.attendance; }),
-                d3.max(selectedSeries, function(d) { return d.attendance; })
-            ]);
-
     // Create the axes (hint: use #xAxis and #yAxis)
     var xAxes = d3.select("#xAxis")
         .attr("transform", "translate(0," + (svgBounds.height - xAxisSize) + ")")
@@ -127,49 +158,61 @@ function updateBarChart() {
     var yAxes = d3.select("#yAxis")
         .attr("transform", "translate(" + yAxisSize + ",0)")
         .call(yAxis);
+    
+    // Create colorScale (note that colorScale
+    // is global! Other functions will refer to it)
+    if(startup)
+    {
+        colorScale = d3.scale.quantize()
+                .range(["rgb(210,248,210)","rgb(186,228,179)","rgb(116,196,118)","rgb(49,163,84)","rgb(0,109,44)"])
+                .domain([
+                    d3.min(selectedSeries, function(d) { return d.attendance; }),
+                    d3.max(selectedSeries, function(d) { return d.attendance; })
+                ]);
+    }
 
     // Create the bars (hint: use #bars)   
-    var tempData = [];
-    tempData.push("dummy");
-    for(var i in selectedSeries)
-    {
-        tempData.push(selectedSeries[i]);
-    }
-    
-    var svgBarChart = d3.select("#barChart").selectAll("#bars")
-    .data(tempData);
-    
+    var svgBarChart = d3.selectAll("#bars").selectAll("rect")
+    .data(selectedSeries);
+
+//    console.log("updateBarChart(): selectedSeries");
+//    console.log(selectedSeries);
+//    console.log(svgBarChart);
     //Use the sample of lecture
     //http://dataviscourse.net/2015/lectures/lecture-d3-layouts-maps/
     svgBarChart.enter()
-    .append("rect")
-    .style("fill", function(d){
+    .append("rect");
+    svgBarChart.style("fill", function(d){
         var value = d.attendance;
+//        console.log("value");
+//        console.log(value);
         if(value) 
         {
             return colorScale(value);
+            //return "steelblue";
         } 
         else 
         {
             return "#ccc";
         }
     })
-    .attr("x", function(d, i){
+    .attr("x", function(d){
+        //console.log(d.Date);
         return xScale(d.Date);})
     .attr("y", function(d){
+        //console.log(d.attendance);
         return yScale(d.attendance);})
     .attr("width", xScale.rangeBand())
-    .attr("height", function(d, i){
-        return svgBounds.height - xAxisSize - yScale(d.attendance);})
+    .attr("height", function(d){
+        return svgBounds.height - xAxisSize - yScale(d.attendance);});
         // ******* TODO: PART IV *******
-    
+
     // Make the bars respond to hover and click events
-    .on("mouseover", function(d){setHover(d);})
+    svgBarChart.on("mouseover", function(d){setHover(d);})
     .on("mouseout", function(d){clearHover();})
     .on("click", function(d){changeSelection(d);});
     
     svgBarChart.exit().remove();
-    
 
 }
 
@@ -217,7 +260,7 @@ function updateForceDirectedGraph() {
         .start();
 
     // Draw the links (hint: use #links)
-    var link = d3.select("#graph").selectAll("#links")
+    var link = d3.select("#graph").select("#links").selectAll("line")
             .data(data.edges);
     
     link.enter().append("line")
@@ -229,25 +272,22 @@ function updateForceDirectedGraph() {
     // Update the links based on the current selection
 
     // Draw the nodes (hint: use #nodes), and make them respond to dragging
-    var node = d3.select("#graph").selectAll("#nodes")
+    var node = d3.select("#graph").select("#nodes").selectAll("path")
             .data(data.vertices);
     
     node.enter()
         .append("path")
         .attr("d", nodeShape)
         .attr("class", nodeClass)
+        // ******* TODO: PART IV *******
+    
+    // Make the nodes respond to hover and click events
         .on("mouseover", function(d){setHover(d);})
         .on("mouseout", function(d){clearHover();})
         .on("click", function(d){changeSelection(d);})
         .call(force.drag);
 
     node.exit().remove();
-    
-
-    
-    // ******* TODO: PART IV *******
-    
-    // Make the nodes respond to hover and click events
     
     // ******* TODO: PART V *******
     
@@ -305,18 +345,57 @@ function updateMap() {
         .attr("r", radium)
         .attr("transform", function(d) {return "translate(" + projection([d.longitude,d.latitude]) + ")";})
         .attr("class", "game")
+        .attr("opacity", 0)
         .on("mouseover", function(d){setHover(d);})
         .on("mouseout", function(d){clearHover();})
         .on("click", function(d){changeSelection(d);});
     
-    svgPoints.exit().remove();
+    
     
     // ******* TODO: PART V *******
     
     // Update the circle appearance (set the fill to the
     // mean attendance of all selected games... if there
     // are no matching games, revert to the circle's default style)
+    svgPoints.transition()
+    .duration(100)
+    .attr("r", function(d){
+        if(startup)
+        {
+            return radium;
+        }
+        else
+        {
+            var flag = false;
+            selectedSeries.forEach( function(input){
+                if(parseFloat(d.latitude) == parseFloat(input.latitude) && parseFloat(d.longitude) == parseFloat(input.longitude))
+                {
+                    flag = true;
+                }
+            });
+            if(flag)
+            {
+                console.log("updateMap(): Amplify");
+                return radium*2;
+            }
+            else
+            {
+                console.log("updateMap(): Remain");
+                return radium;
+            }
+        }
+    })
+    .attr("opacity", 1);
+    
+    svgPoints.exit()
+        .attr("opacity", 1)
+        .transition()
+        .duration(100)
+        .attr("opacity", 0)
+        .remove();
+    
     console.log("Leave updateMap");
+    startup = false;
 }
 
 function drawStates(usStateData) {
