@@ -146,15 +146,36 @@ CountVis.prototype.initVis = function () {
     .x(self.xScale)
     .scaleExtent([0.1,32])
     .on('zoom', function() {
- 
-        //update path
-        self.visG.select(".area").attr("d", self.area);
+         
+        //update brush
+        if(null != self.brushExtent)
+        {
+            var brushGraph = self.visG.select("#brush");
+            brushGraph.call(self.brush.extent(self.brushExtent));
+        }
         
         //update xScale
         self.visG.select(".xAxis").call(self.xAxis);
         
-        //update brush
-        self.visG.select("#brush").call(self.brush.extent(self.brushExtent));
+        //update path
+        //self.visG.select(".area").attr("d", self.area);
+        var newData = [];
+        var j = 0
+        self.displayData.forEach(function(d, i){
+            if(self.xScale(d.time) <= self.graphW && self.xScale(d.time) >= 0)
+            {
+                newData[j] = d;
+                j++;
+            }
+                
+        });
+        
+        var areaGraph = self.visG.selectAll(".area").data([newData]);
+        areaGraph.enter()
+            .append("path")
+            .attr("class", "area");
+        areaGraph
+            .attr("d", self.area);
         
         
     });
@@ -180,7 +201,6 @@ CountVis.prototype.wrangleData = function () {
  */
 CountVis.prototype.updateVis = function () {
 
-    console.log("Enter updateVis()");
     var self = this;
 
     // update the scales :
@@ -209,7 +229,18 @@ CountVis.prototype.updateVis = function () {
     self.area.interpolate("step");
 
     // ******* BONUS TASK 2c (you will need to edit this code) *******
-    var areaGraph = self.visG.selectAll(".area").data([self.displayData]);
+    var newData = [];
+    var j = 0
+    self.displayData.forEach(function(d, i){
+        if(self.xScale(d.time) <= self.graphW && self.xScale(d.time) >= 0)
+        {
+            newData[j] = d;
+            j++;
+        }
+
+    });
+    
+    var areaGraph = self.visG.selectAll(".area").data([newData]);
     areaGraph.enter()
         .append("path")
         .attr("class", "area");
@@ -232,19 +263,12 @@ CountVis.prototype.updateVis = function () {
         self.startup = false;
 
     }
-    else
-    {
-//        self.brush(d3.select("#brush").transition());
-//        self.brush.event(d3.select("#brush").transition().delay(1000))
-//        self.visScale = d3.time.scale().domain(self.xScale.extent()).range([0,self.graphW]);
-//        self.brush.x(self.visScale);
-    }
 };
 
 
 CountVis.prototype.resetZoom = function () {
     var self = this;
-    console.log("reset Zoom Btn Pressed");
+
     
     var sliderScale = d3.scale.linear().domain([1, 0.1]).range([200, 0]);
 
@@ -257,7 +281,7 @@ CountVis.prototype.resetZoom = function () {
     var minMaxY = [0, d3.max(self.displayData.map(function (d) {
     return d.count;
     }))];
-    console.log(minMaxY);
+
     self.yScale.domain(minMaxY);
 
     d3.select(".sliderHandle")
@@ -296,7 +320,7 @@ CountVis.prototype.addSlider = function (svg) {
         var minMaxY = [0, d3.max(self.displayData.map(function (d) {
         return d.count;
         }))];
-        console.log(minMaxY);
+
         self.yScale.domain(minMaxY);
 
         d3.select(this)

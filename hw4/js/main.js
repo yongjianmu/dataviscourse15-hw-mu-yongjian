@@ -51,8 +51,6 @@
         // Also make sure to display something reasonable about
         // the brush in #brushInfo
         eventHandler.on("selectionChanged",function(d){
-                console.log("selectionChanged");
-                console.log(d);
             
             prioVis.onSelectionChange(d[0], d[1]);
             ageVis.onSelectionChange(d[0], d[1]);

@@ -152,7 +152,7 @@ PrioVis.prototype.updateVis = function () {
 
     bars.attr({
         "height": function (d) {
-            return self.graphH - self.yScale(d) - 1;
+            return self.graphH - self.yScale(d);
         },
         "y": function (d) {
             return self.yScale(d);
@@ -206,8 +206,6 @@ PrioVis.prototype.filterAndAggregate = function (_filter) {
     
     // ******* TASK 1b *******
     // Implement the function that filters the data and sums the values
-    console.log("filterAndAggregate(): filter: ");
-    console.log(filter);
     
     // create an array of values for the priorities 0-15
     var res = d3.range(0, 16).map(function () {
