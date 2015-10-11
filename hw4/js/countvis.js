@@ -151,7 +151,21 @@ CountVis.prototype.initVis = function () {
         if(null != self.brushExtent)
         {
             var brushGraph = self.visG.select("#brush");
-            brushGraph.call(self.brush.extent(self.brushExtent));
+            if( 0 >= self.xScale(self.brushExtent[0]))
+            {
+                if(0 >= self.xScale(self.brushExtent[1]))
+                {
+                    brushGraph.call(self.brush.extent([self.xScale.invert(0), self.xScale.invert(0)]));
+                }
+                else
+                {
+                    brushGraph.call(self.brush.extent([self.xScale.invert(0), self.brushExtent[1]]));
+                }
+            }
+            else
+            {
+                brushGraph.call(self.brush.extent(self.brushExtent));
+            }
         }
         
         //update xScale

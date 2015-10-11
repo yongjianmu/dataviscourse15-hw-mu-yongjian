@@ -188,7 +188,7 @@ PrioVisCmp.prototype.updateVis = function () {
         "stroke": "steelblue",
         "stroke-width": 2,
         "fill": null,
-        "fill-opacity":0
+        "fill-opacity": 0
     });
     path.attr("d", line(self.displayData));
     
@@ -211,7 +211,7 @@ PrioVisCmp.prototype.updateVis = function () {
         "stroke": "red",
         "stroke-width": 2,
         "fill": null,
-        "fill-opacity":0
+        "fill-opacity": 0
     });
     path.attr("d", line(self.origData));
 };
