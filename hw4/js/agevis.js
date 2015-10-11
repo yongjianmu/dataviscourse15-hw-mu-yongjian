@@ -57,6 +57,10 @@ AgeVis.prototype.initVis = function () {
     var self = this;
 
     self.svg = self.parentElement.select("svg");
+    
+    //Add Info
+    self.chartInfo = document.getElementById("ageVisInfo"); 
+    self.chartInfo.innerHTML = "Age Distribution";
 
     self.graphW = 200;
     self.graphH = 270;
@@ -114,7 +118,7 @@ AgeVis.prototype.updateVis = function () {
     // var options = _options || {};
 
     var self = this;
-
+    
     // update the scales:
     var minMaxX = d3.extent(self.displayData);
     self.xScale.domain(minMaxX);

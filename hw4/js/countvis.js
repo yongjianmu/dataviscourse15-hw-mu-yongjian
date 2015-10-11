@@ -59,6 +59,10 @@ CountVis.prototype.initVis = function () {
     var self = this;
 
     self.svg = d3.select("#countVis svg");
+    
+    //Add Info
+    self.chartInfo = document.getElementById("countVisInfo"); 
+    self.chartInfo.innerHTML = "Votes Distribution";
 
     self.graphW = 550;
     self.graphH = 270;
@@ -254,7 +258,7 @@ CountVis.prototype.resetZoom = function () {
 
     var value = Math.max(0, Math.min(200, d3.event.y));
 
-    var sliderValue = sliderScale.invert(value);
+    var sliderValue = sliderScale.invert(200);
 
     self.yScale = d3.scale.pow().exponent(sliderValue).range([self.graphH, 0]);
     self.yAxis.scale(self.yScale);

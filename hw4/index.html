@@ -25,6 +25,7 @@
     <script src="js/priovis.js"></script>
     <script src="js/agevis.js"></script>
     <script src="js/countvis.js"></script>
+    <script src="js/priovis_compare.js"></script>
 
     <!-- add own stylesheet-->
     <link rel="stylesheet" type="text/css" href="css/myStyle.css">
@@ -57,11 +58,13 @@
 
             <div class="row">
                 <div id="countVis" class="col-md-9">
+                    <span id="countVisInfo"></span>
                     <svg width="650" height="330">
 
                     </svg>
                 </div>
                 <div id="ageVis" class="col-md-3">
+                    <span id="ageVisInfo"></span>
                     <svg width="230" height="330">
 
                     </svg>
@@ -69,12 +72,23 @@
             </div>
 
             <div class="row">
-                <div id="prioVis" class="col-md-12">
+                <span id="prioVisInfo"></span>
+                <div id="prioVis" class="col-md-12">       
                     <svg width="650" height="440">
 
                     </svg>
                 </div>
             </div>
+            
+            <div class="row">
+                <span id="prioVisCmpInfo"></span>
+                <div id="prioVisCmp" class="col-md-20">
+                    <svg width="650" height="440">
+
+                    </svg>
+                </div>
+            </div>
+            
         </div>
         
         <!-- We put the main.js script here, because it runs as soon as it's loaded. We only want this to happen after the rest of our DOM already exists. -->

@@ -41,6 +41,7 @@
         var countVis = new CountVis(d3.select("#countVis"), allData, metaData, eventHandler);
         var ageVis = new AgeVis(d3.select("#ageVis"), allData, metaData);
         var prioVis = new PrioVis(d3.select("#prioVis"), allData, metaData);
+        var prioVisCmp = new PrioVisCmp(d3.select("#prioVisCmp"), allData, metaData);
         
         // ******** TASK 3b, 3c *******
         // Bind the eventHandler to the Vis Objects
@@ -55,6 +56,7 @@
             
             prioVis.onSelectionChange(d[0], d[1]);
             ageVis.onSelectionChange(d[0], d[1]);
+            prioVisCmp.onSelectionChange(d[0], d[1]);
         
         });
     };

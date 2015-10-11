@@ -14,19 +14,19 @@
  * */
 
 /**
- * PrioVis object for HW4
+ * PrioVisCmp object for HW4
  * @param _parentElement -- the (D3-selected) HTML or SVG element to which to attach the vis
  * @param _data -- the data array
  * @param _metaData -- the meta-data / data description object
  * @constructor
  */
-function PrioVis (_parentElement, _data, _metaData) {
+function PrioVisCmp (_parentElement, _data, _metaData) {
     /**
      * A word about "this":
      *
      * The meaning of "this" can change from function call to function call; the way
-     * we have implemented the class, "this" refers to the PrioVis class
-     * in each of the PrioVis.prototype.xxxxxxxx = functions.
+     * we have implemented the class, "this" refers to the PrioVisCmp class
+     * in each of the PrioVisCmp.prototype.xxxxxxxx = functions.
      * However, when you create inline functions, "this" often refers
      * to something else. Usually it points to the function itself. In D3
      * .attr(function (d, i) {}) functions, for example, "this" refers
@@ -51,14 +51,15 @@ function PrioVis (_parentElement, _data, _metaData) {
 /**
  * Method should be called as soon as data is available.. sets up the SVG and the variables
  */
-PrioVis.prototype.initVis = function () {
+PrioVisCmp.prototype.initVis = function () {
     var self = this; // read about the this
-
-    self.svg = self.parentElement.select("svg");
     
     //Add Info
-    self.chartInfo = document.getElementById("prioVisInfo"); 
-    self.chartInfo.innerHTML = "Priorities Distribution";
+    self.chartInfo = document.getElementById("prioVisCmpInfo"); 
+    self.chartInfo.innerHTML = "Priorities Compare Distribution <br>" + '<font color="steelblue">'+"Steelblue line means brushed data <br>"+'</font>'
+    + '<font color="red">'+"Red line means overview data"+'</font>';
+
+    self.svg = self.parentElement.select("svg");
 
     self.graphW = 500;
     self.graphH = 300;
@@ -98,9 +99,16 @@ PrioVis.prototype.initVis = function () {
 
     // filter, aggregate, modify data
     self.wrangleData(null);
+    
+    // Store the original display data
+    self.origData = [];
+    self.displayData.forEach(function(d, i){
+        self.origData[i] = self.displayData[i];
+    });
 
     // call the update method
     self.updateVis();
+    
 };
 
 
@@ -108,7 +116,7 @@ PrioVis.prototype.initVis = function () {
  * Method to wrangle the data. In this case it takes an options object
  * @param _filterFunction - a function that filters data or "null" if none
  */
-PrioVis.prototype.wrangleData = function (_filterFunction) {
+PrioVisCmp.prototype.wrangleData = function (_filterFunction) {
     var self = this;
     
     // displayData should hold the data which is visualized
@@ -121,13 +129,13 @@ PrioVis.prototype.wrangleData = function (_filterFunction) {
 /**
  * the drawing function - should use the D3 selection, enter, exit
  */
-PrioVis.prototype.updateVis = function () {
+PrioVisCmp.prototype.updateVis = function () {
 
 
     var self = this;
 
     // update the scales :
-    var minMaxY = [0, d3.max(self.displayData)];
+    var minMaxY = [0, d3.max(self.origData)];
     self.yScale.domain(minMaxY);
     self.yAxis.scale(self.yScale);
 
@@ -135,29 +143,77 @@ PrioVis.prototype.updateVis = function () {
     self.visG.select(".yAxis").call(self.yAxis);
     
     // draw the bars :
-    var bars = self.visG.selectAll(".bar").data(self.displayData);
-    bars.exit().remove();
-    bars.enter().append("rect")
-        .attr({
-            "class": "bar",
-            "width": self.xScale.rangeBand(),
-            "x": function (d, i) {
-                return self.xScale(i);
-            }
-        }).style({
-            "fill": function (d, i) {
-                return self.metaData.priorities[i]["item-color"];
-            }
-        });
+//    var bars = self.visG.selectAll(".bar").data(self.displayData);
+//    bars.exit().remove();
+//    bars.enter().append("rect")
+//        .attr({
+//            "class": "bar",
+//            "width": self.xScale.rangeBand(),
+//            "x": function (d, i) {
+//                return self.xScale(i);
+//            }
+//        }).style({
+//            "fill": function (d, i) {
+//                return self.metaData.priorities[i]["item-color"];
+//            }
+//        });
+//
+//    bars.attr({
+//        "height": function (d) {
+//            return self.graphH - self.yScale(d) - 1;
+//        },
+//        "y": function (d) {
+//            return self.yScale(d);
+//        }
+//    });
+    
+    //Line Chart
+    //Brushed data
 
-    bars.attr({
-        "height": function (d) {
-            return self.graphH - self.yScale(d) - 1;
-        },
-        "y": function (d) {
-            return self.yScale(d);
-        }
+    var line = d3.svg.line()
+     .x(function(d,i) { 
+         return self.xScale(i) + self.graphW/32; })
+     .y(function(d,i) {
+         return self.yScale(d); })
+     .interpolate("linear");
+    
+    var path = self.visG.selectAll(".path").data(self.displayData);
+    path.exit().remove();
+    path.enter()
+    .append("path")
+    .attr({
+        "class": "path"
+    })
+    .style({
+        "stroke": "steelblue",
+        "stroke-width": 2,
+        "fill": null,
+        "fill-opacity":0
     });
+    path.attr("d", line(self.displayData));
+    
+    //Origdata
+    var line = d3.svg.line()
+     .x(function(d,i) { 
+         return self.xScale(i) + self.graphW/32; })
+     .y(function(d,i) {
+         return self.yScale(d); })
+     .interpolate("linear");
+    
+    var path = self.visG.selectAll(".OrigPath").data(self.origData);
+
+    path.enter()
+    .append("path")
+    .attr({
+        "class": "OrigPath"
+    })
+    .style({
+        "stroke": "red",
+        "stroke-width": 2,
+        "fill": null,
+        "fill-opacity":0
+    });
+    path.attr("d", line(self.origData));
 };
 
 
@@ -167,7 +223,7 @@ PrioVis.prototype.updateVis = function () {
  * be defined here.
  * @param selection
  */
-PrioVis.prototype.onSelectionChange = function (selectionStart, selectionEnd) {
+PrioVisCmp.prototype.onSelectionChange = function (selectionStart, selectionEnd) {
     var self = this;
     
     // call wrangleData with a filter function
@@ -194,7 +250,7 @@ PrioVis.prototype.onSelectionChange = function (selectionStart, selectionEnd) {
  * @param _filter - A filter can be, e.g.,  a function that is only true for data of a given time range
  * @returns {Array|*}
  */
-PrioVis.prototype.filterAndAggregate = function (_filter) {
+PrioVisCmp.prototype.filterAndAggregate = function (_filter) {
     var self = this;
 
     // Set filter to a function that accepts all items
