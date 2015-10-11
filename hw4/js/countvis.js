@@ -91,16 +91,14 @@ CountVis.prototype.initVis = function () {
         else
         {
             self.eventHandler.selectionChanged(self.brush.extent());
-            textBounds.innerHTML = self.brush.extent()[0].toDateString() + " to " + self.brush.extent()[1].toDateString();
-        }      
+            textBounds.innerHTML = self.brush.extent()[0].toDateString() + " to " + self.brush.extent()[1].toDateString();       
+        }
+        self.brushExtent = self.brush.extent();
     };
     
-//    console.log("self.data");
-//    console.log(self.data);
     self.visScale = d3.time.scale().domain(d3.extent(self.data.map(function(d) { return d.time; }))).range([0,self.graphW]);
-    //self.visScale = d3.time.scale().range([0, self.graphW]);
     self.brush = d3.svg.brush()
-        .x(self.visScale)
+        .x(self.xScale)
         .on("brush", brushed);
     
     // create the brush, and
@@ -144,32 +142,22 @@ CountVis.prototype.initVis = function () {
     // ******* BONUS TASK 2c *******
     // define zoom
     // reference website: http://jsfiddle.net/rzhu1140/x8gL6yc7/5/
-//    self.zoom = d3.behavior.zoom()
-//    .x(self.xScale)
-//    .scaleExtent([0.1,32])
-//    .on('zoom', function() {
-// 
-//        //update path
-//        var area = d3.svg.area()
-//        .x(function (d) {
-//            return self.xScale(d.time);
-//        })
-//        .y0(270)
-//        .y1(function (d) {
-//            return self.yScale(d.count);
-//        });
-//        area.interpolate("step");
-//        
-//        var areaGraph = self.visG.selectAll(".area").data([self.displayData]);
-//        areaGraph.enter()
-//        .append("path")
-//        .attr("class", "area");
-//        areaGraph
-//        .attr("d", area);
-//        
-//        //update brush
-//        console.log(self.visG.select("#brush"));
-//    });
+    self.zoom = d3.behavior.zoom()
+    .x(self.xScale)
+    .scaleExtent([0.1,32])
+    .on('zoom', function() {
+ 
+        //update path
+        self.visG.select(".area").attr("d", self.area);
+        
+        //update xScale
+        self.visG.select(".xAxis").call(self.xAxis);
+        
+        //update brush
+        self.visG.select("#brush").call(self.brush.extent(self.brushExtent));
+        
+        
+    });
 
     // call the update method
     self.updateVis();
@@ -210,7 +198,7 @@ CountVis.prototype.updateVis = function () {
     // add zoom, and block two events
 
 
-    var area = d3.svg.area()
+    self.area = d3.svg.area()
         .x(function (d) {
             return self.xScale(d.time);
         })
@@ -218,7 +206,7 @@ CountVis.prototype.updateVis = function () {
         .y1(function (d) {
             return self.yScale(d.count);
         });
-    area.interpolate("step");
+    self.area.interpolate("step");
 
     // ******* BONUS TASK 2c (you will need to edit this code) *******
     var areaGraph = self.visG.selectAll(".area").data([self.displayData]);
@@ -226,10 +214,10 @@ CountVis.prototype.updateVis = function () {
         .append("path")
         .attr("class", "area");
     areaGraph
-        .attr("d", area);
+        .attr("d", self.area);
     
     
-    if(true == self.startup)
+    if(true ==  self.startup)
     {
         self.visG.append("g")
         .attr("class", "x brush")
@@ -237,15 +225,19 @@ CountVis.prototype.updateVis = function () {
         .call(self.brush)
         .selectAll("rect")
         .attr("y", 0)
-    //    .call(self.zoom)
-    //    .on("mousedown.zoom", null)
+        .call(self.zoom)
+        .on("mousedown.zoom", null)
         .attr("height", self.graphH);
+        
         self.startup = false;
+
     }
     else
     {
-        self.brush(d3.select("#brush").transition());
-        self.brush.event(d3.select("#brush").transition().delay(1000))
+//        self.brush(d3.select("#brush").transition());
+//        self.brush.event(d3.select("#brush").transition().delay(1000))
+//        self.visScale = d3.time.scale().domain(self.xScale.extent()).range([0,self.graphW]);
+//        self.brush.x(self.visScale);
     }
 };
 
