@@ -55,6 +55,7 @@ PrioVisCmp.prototype.initVis = function () {
     var self = this; // read about the this
     
     //Add Info
+    var dataSet = [0, 21, 56, 91, 126, 160, 195, 230, 265, 300];
     self.chartInfo = document.getElementById("prioVisCmpInfo"); 
     self.chartInfo.innerHTML = "Priorities Compare Distribution <br>" + '<font color="steelblue">'+"Steelblue line means brushed data <br>"+'</font>'
     + '<font color="red">'+"Red line means overview data"+'</font>';
@@ -105,6 +106,35 @@ PrioVisCmp.prototype.initVis = function () {
     self.displayData.forEach(function(d, i){
         self.origData[i] = self.displayData[i];
     });
+    
+    //draw the verticle grid
+    
+    var xGrid = self.visG.selectAll("lineX")
+    .data(self.origData);
+    xGrid.enter()
+    .append("line")
+    .attr("x1", function(d, i){
+        return self.xScale(i);})
+    .attr("x2", function(d, i){
+        return self.xScale(i);})
+    .attr("y1", 0)
+    .attr("y2", self.graphH)
+    .style("stroke", "#ccc");
+    
+    //draw the horizontal grid
+    var yGrid = self.visG.selectAll("lineY")
+    .data(dataSet);
+    yGrid.enter()
+    .append("line")
+    .attr("x1", 0)
+    .attr("x2", self.graphW)
+    .attr("y1", function(d, i){
+        return d;
+    })
+    .attr("y2", function(d, i){
+        return d;
+    })
+    .style("stroke", "#ccc");
 
     // call the update method
     self.updateVis();
@@ -201,7 +231,7 @@ PrioVisCmp.prototype.updateVis = function () {
      .interpolate("linear");
     
     var path = self.visG.selectAll(".OrigPath").data(self.origData);
-
+    path.exit().remove();
     path.enter()
     .append("path")
     .attr({
