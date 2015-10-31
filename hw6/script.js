@@ -1,18 +1,18 @@
 /*globals VolumeRenderer, d3, console*/
 var scale1 = 0.15;
-var scale2 = 0.7;
-var scale3 = 1.0;
+var scale2 = 0.6;
+var scale3 = 0.9;
 
-var red1 = 204;
+var red1 = 210;
 var green1 = 102;
-var blue1 = 0;
+var blue1 = 10;
 
-var red2 = 0;
+var red2 = 100;
 var green2 = 250;
 var blue2 = 88;
 
 var red3 = 242;
-var green3 = 0;
+var green3 = 100;
 var blue3 = 242;
 
 var renderer,
@@ -88,7 +88,7 @@ function setup() {
         }
         var gradient = ctx.createLinearGradient( 0, 0, 4, 25 );
         gradient.addColorStop(0, rgb2hex(color));
-        gradient.addColorStop(1, 'transparent');
+        gradient.addColorStop(0.5, 'transparent');
         ctx.fillStyle = gradient;
         ctx.fill();
         console.log("############Value1$$$$$$$$$$$$$$"+rgb2hex(color));
